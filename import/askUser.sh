@@ -885,6 +885,25 @@ function askUserModifications() {
                 ;;
         esac
     done
+
+    finished=0;
+    while [ $finished -eq 0 ]; do
+        read -p "Do you want to add $userToUpdate to sudoers ?" yn;
+        case $yn in
+            [Yy]* )  
+                addToSudoers=1;
+                finished=1;
+                ;;
+
+            [Nn]* ) 
+                finished=1;
+                ;;
+
+            * ) 
+                echo "Please answer yes or no."
+                ;;
+        esac
+    done
 }
 
 

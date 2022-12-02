@@ -21,7 +21,14 @@ function createUser() {
     echo "Type the user password : "
     sudo passwd $username #the -p option of useradd is not recommanded in the manual
 
-    echo "User $username created successfully :)"
+    local status=$?;
+    if [ $status -eq 0 ]; then
+        echo "User $username created successfully :)"
+    else
+        echo "Could not create the user. Check if there is a group with the same name as the wanted new user"
+        echo "userradd error code : $?";
+    fi
+    
 }
 
 # deleteUser()
@@ -84,13 +91,14 @@ function updateUser() {
     updateExpirationDate=0; # userNewExpirationDate
     updateShell=0; # newUserShell
     updateUID=0; # newUserId
+    addToSudoers=0; 
 
     askUserModifications;
 
     echo "Modication of $userToUpdate ...";
 
     if [ $updateUsername -eq 1 ]; then
-        sudo usermod -l $newUsername $userToUpdate;
+        sudo usermod -l $newUsername $userToUpdate &> /dev/null;
         local status=$?;
         if [ $status -eq 0 ]; then
             userToUpdate=$newUsername;
@@ -101,7 +109,7 @@ function updateUser() {
     fi
 
     if [ $updateDirectory -eq 1 ]; then
-        sudo usermod -md $newUserHomeDirectory/$userToUpdate $userToUpdate
+        sudo usermod -md $newUserHomeDirectory/$userToUpdate $userToUpdate &> /dev/null;
         local status=$?;
         if [ $status -eq 0 ]; then
             echo "Home directory updated...";
@@ -112,7 +120,7 @@ function updateUser() {
 
 
     if [ $updateShell -eq 1 ]; then
-        sudo usermod -s $newUserShell $userToUpdate
+        sudo usermod -s $newUserShell $userToUpdate &> /dev/null;
         local status=$?;
         if [ $status -eq 0 ]; then
             echo "Shell updated...";
@@ -123,7 +131,7 @@ function updateUser() {
 
 
     if [ $updateUID -eq 1 ]; then
-        sudo usermod -u $newUserId $userToUpdate
+        sudo usermod -u $newUserId $userToUpdate &> /dev/null;
         local status=$?;
         if [ $status -eq 0 ]; then
             echo "UID updated...";
@@ -132,7 +140,17 @@ function updateUser() {
         fi
     fi
 
+    if [ $addToSudoers -eq 1 ]; then
+        sudo usermod -a -G sudo $userToUpdate &> /dev/null;
+        local status=$?;
+        if [ $status -eq 0 ]; then
+            echo "$userToUpdate added to sudoers...";
+        else
+            echo "Could not add $userToUpdate to sudoers. Error code : $?";
+        fi
+    fi
 
     echo "User udpated :)"
+    echo ""
 
 }
