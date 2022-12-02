@@ -13,7 +13,6 @@ function main() {
     handleUserInput;
 
     resetLanguage;
-    exit 0;
 }
 
 main;

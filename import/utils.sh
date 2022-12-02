@@ -34,4 +34,12 @@ function forceRoot() {
         echo "Forcing sudo... ";
         sudo whoami 1> /dev/null;
     fi
+
+    local status=$?
+    if [ $status -eq 0 ]; then
+        echo "Execution as root."
+    else 
+        echo "Exit with error code : $status";
+        exit $status;
+    fi
 }
